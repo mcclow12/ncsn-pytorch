@@ -5,6 +5,16 @@ from utils import *
 from torch.optim import Adam
 from torchvision.utils import save_image
 
+#def anneal_dsm_score_estimation(scorenet, samples, labels, sigmas, A, anneal_power=2.):
+#    used_sigmas = sigmas[labels].view(samples.shape[0], *([1] * len(samples.shape[1:])))
+#    perturbed_samples = samples + A*used_sigmas#torch.randn_like(samples) * used_sigmas
+#    target = - 1 / (used_sigmas ** 2) * (perturbed_samples - samples)
+#    scores = scorenet(perturbed_samples, labels)
+#    target = target.view(target.shape[0], -1)
+#    scores = scores.view(scores.shape[0], -1)
+#    loss = 1 / 2. * ((scores - target) ** 2).sum(dim=-1) * used_sigmas.squeeze() ** anneal_power
+#
+#    return loss.mean(dim=0)
 
 class NCSNTrainer():
 
@@ -30,10 +40,10 @@ class NCSNTrainer():
         perturbed_batch = batch + torch.randn_like(batch)*selected_sigmas
         target = -(perturbed_batch - batch)/(selected_sigmas**2)
         #compute output
-        output = self.ncsn(batch, which_sigmas)
+        output = self.ncsn(perturbed_batch, which_sigmas)
         #loss is ~ euclidean norm squared of the difference
         diff = target - output
-        loss = (2*batch_size) * torch.sum((selected_sigmas*diff)**2)
+        loss = (1/(2*batch_size)) * torch.sum((diff*selected_sigmas)**2)
         return loss
 
     
@@ -47,12 +57,15 @@ class NCSNTrainer():
                 #to minimize expected loss
                 which_sigmas = torch.randint(
                         0, len(self.sigmas), (batch.shape[0],))
+#                A = torch.randn_like(batch)
                 loss = self._loss_tensor(batch, which_sigmas)
+#                loss2 = anneal_dsm_score_estimation(self.ncsn, batch, which_sigmas, self.sigmas, A) 
+#                print(loss.item(), loss2.item())
                 loss.backward()
                 self.ncsn_opt.step()
                 if curr_iter%10==0:
                     print('iter: ', curr_iter, 
-                            '  |  loss: ', round(loss.item()))
+                            '  |  loss: ', round(loss.item(), 3))
                 curr_iter += 1
                 if curr_iter % self.save_every==0 and curr_iter > 0:
                     self._save_model(curr_iter)
