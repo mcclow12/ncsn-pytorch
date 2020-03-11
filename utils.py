@@ -21,7 +21,7 @@ def get_train_set(batch_size):
         transforms.ToTensor()])
 
     trainset = torchvision.datasets.MNIST(
-            root='../data', train=True, download=True, 
+            root='./data', train=True, download=True, 
             transform=transform
     )
     trainloader = torch.utils.data.DataLoader(

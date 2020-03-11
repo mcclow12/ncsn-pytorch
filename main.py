@@ -42,7 +42,7 @@ ncsn = CondRefineNetDilated(mnist_config)
 dataloader = get_train_set(batch_size)
 
 trainer = NCSNTrainer(ncsn, lr, dataloader, num_iters, beta1, beta2, checkpoints_folder, save_every)
-#trainer.train_ncsn()
+trainer.train_ncsn()
 
 model_path = './run/logs/mnist/checkpoint.pth'
 
