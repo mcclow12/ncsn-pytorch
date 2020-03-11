@@ -16,6 +16,6 @@ where
 
 ![](https://github.com/mcclow12/ncsn-pytorch/blob/master/.img/loss_summand.png)
 
-The function that minimizes this loss is equal to the score function (for each variance) almost everywhere. Once the network is trained, annealed Langevin dynamics is used to obtain samples from the perturbed distribution with high levels of Gaussian noise, and then the noise is gradually annealed to near zero. In the end, samples from the true data distribution plus an invisible amount of Gussian noise are obtained.
+The function that minimizes this loss has been shown to equal to the score function (for each variance respectively) almost everywhere. Once the network is trained, annealed Langevin dynamics is used to obtain samples from the perturbed distribution with high levels of Gaussian noise, and then the noise is gradually annealed to near zero. In the end, samples from the true data distribution plus an invisible amount of Gussian noise are obtained.
 
 ## Sample Images
