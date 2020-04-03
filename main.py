@@ -8,7 +8,7 @@ beta1 = 0.9
 beta2 = 0.999
 
 batch_size = 32 #128 too much memory for me
-num_iters = 200000
+num_iters = 100001
 
 #data params
 dataset = "MNIST"
@@ -21,7 +21,7 @@ ngf = 64
 
 #save params
 checkpoints_folder = './checkpoints'
-save_every = 1000
+save_every = 100
 
 mnist_config = config(
             dataset, 
@@ -38,7 +38,7 @@ ncsn = CondRefineNetDilated(mnist_config)
 dataloader = get_train_set(batch_size)
 
 trainer = NCSNTrainer(ncsn, lr, dataloader, num_iters, beta1, beta2, checkpoints_folder, save_every)
-#trainer.train_ncsn()
+trainer.train_ncsn()
 
 model_path = './checkpoints/ncsn_1000'
 
