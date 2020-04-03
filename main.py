@@ -7,12 +7,8 @@ lr = 1e-3
 beta1 = 0.9
 beta2 = 0.999
 
-batch_size = 8 #128 too much memory for me
-num_iters = 20000
-
-#Lagenvian params
-lang_eps = 2e-5
-lang_T = 1000
+batch_size = 32 #128 too much memory for me
+num_iters = 200000
 
 #data params
 dataset = "MNIST"
@@ -42,18 +38,16 @@ ncsn = CondRefineNetDilated(mnist_config)
 dataloader = get_train_set(batch_size)
 
 trainer = NCSNTrainer(ncsn, lr, dataloader, num_iters, beta1, beta2, checkpoints_folder, save_every)
-trainer.train_ncsn()
+#trainer.train_ncsn()
 
-model_path = './run/logs/mnist/checkpoint.pth'
+model_path = './checkpoints/ncsn_1000'
 
-state_dict = torch.load(model_path, map_location=torch.device('cpu'))[0]
+state_dict = torch.load(model_path, map_location=torch.device('cpu'))
 trained_ncsn = CondRefineNetDilated(mnist_config)
-trained_ncsn = torch.nn.DataParallel(trained_ncsn)
 trained_ncsn.load_state_dict(state_dict)
 trained_ncsn.eval()
-eps = 1e-5
+image_shape = (32, 32, 1)
+eps = 2e-5
 T = 100
-num_samples = 1
-nrow = 1
-sample = trainer.save_samples(num_samples, nrow, trained_ncsn, eps, T)
-
+nrow = 8 
+trainer.save_sample_grid(nrow, trained_ncsn, eps, T)
