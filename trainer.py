@@ -5,7 +5,6 @@ from utils import *
 from torch.optim import Adam
 from torchvision.utils import save_image
 
-
 class NCSNTrainer():
 
     def __init__(self, ncsn, lr, dataloader, num_iters, beta1, beta2, checkpoints_folder, save_every):
@@ -37,19 +36,8 @@ class NCSNTrainer():
         normsq = torch.sum(diff**2, dim=[i for i in range (1, len(diff.shape))])
         loss = (1/(2*batch_size))*normsq*torch.squeeze(selected_sigmas)**2 
         return loss.sum()
-
-    def _correct_loss_tensor(self, scorenet, samples, labels, sigmas, anneal_power=2.):
-        used_sigmas = sigmas[labels].view(samples.shape[0], *([1] * len(samples.shape[1:])))
-        perturbed_samples = samples + torch.randn_like(samples) * used_sigmas
-        target = - 1 / (used_sigmas ** 2) * (perturbed_samples - samples)
-        scores = scorenet(perturbed_samples, labels)
-        target = target.view(target.shape[0], -1)
-        scores = scores.view(scores.shape[0], -1)
-        loss = 1 / 2. * ((scores - target) ** 2).sum(dim=-1) * used_sigmas.squeeze() ** anneal_power
-
-        return loss.mean(dim=0)
-
     
+
     def train_ncsn(self):
         os.makedirs(self.save_folder, exist_ok=True)
         curr_iter = 0
